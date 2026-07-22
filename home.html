@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="home-bg">
+    <!-- your existing home page content stays here -->
+<!-- ================= PROJECT TITLE ================= -->
+<div class="title-bar text-center">
+    <h1 class="main-title">
+        <span class="highlight">
+            AI Based Fertilizer Recommendation System for Sustainable Agriculture
+        </span>
+    </h1>
+
+    <p class="subtitle">
+        Smart, data-driven fertilizer decisions for modern farmers
+    </p>
+</div>
+
+<!-- ================= MAIN SECTION ================= -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+
+            <!-- LEFT CONTENT -->
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h3 class="section-heading">🌾 Why This System?</h3>
+
+                <p class="section-text">
+                    This system leverages real-time weather data and machine learning models
+                    to recommend the most suitable fertilizer for specific crops.
+                    It enhances crop yield, minimizes resource wastage,
+                    reduces soil degradation, and promotes sustainable agricultural practices.
+                </p>
+
+                <a href="/fertilizer" class="btn btn-success btn-lg mt-3">
+                    Get Recommendation
+                </a>
+            </div>
+
+            <!-- RIGHT FEATURES -->
+            <div class="col-md-6">
+
+                <div class="feature-card">
+                    🌦 <strong>Weather Integration</strong>
+                    <p>Automatically fetches temperature, humidity, and soil moisture</p>
+                </div>
+
+                <div class="feature-card">
+                    🤖 <strong>AI-Based Prediction</strong>
+                    <p>Uses machine learning to recommend the best fertilizer</p>
+                </div>
+
+                <div class="feature-card">
+                    🔊 <strong>Voice Assistance</strong>
+                    <p>Audio guidance for fertilizer usage and quantity</p>
+                </div>
+
+                <div class="feature-card">
+                    🌐 <strong>Local Language Support</strong>
+                    <p>Supports English, Hindi, and Telugu for farmer convenience</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+/* TITLE BAR */
+.title-bar{
+    padding:40px 15px 20px;
+}
+
+.main-title{
+    font-size:44px;
+    font-weight:800;
+    line-height:1.25;
+    margin-bottom:10px;
+}
+
+.highlight{
+    color:#2e7d32;
+}
+
+.subtitle{
+    color:#555;
+    font-size:16px;
+}
+
+/* HERO SECTION */
+.hero-section{
+    padding:35px 0 50px;
+}
+
+/* TEXT */
+.section-heading{
+    font-weight:600;
+    margin-bottom:12px;
+}
+
+.section-text{
+    color:#555;
+    line-height:1.7;
+    font-size:15px;
+}
+
+/* FEATURE CARDS */
+.feature-card{
+    background:#ffffff;
+    padding:16px 18px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+    margin-bottom:12px;
+    transition:all 0.3s ease;
+}
+
+.feature-card p{
+    margin:5px 0 0;
+    font-size:14px;
+    color:#666;
+}
+
+.feature-card:hover{
+    transform:translateY(-5px);
+}
+/* HOME PAGE BACKGROUND IMAGE */
+.home-bg{
+    min-height:85vh;
+    padding:40px 0;
+
+    background:
+        linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)),
+        url('https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    border-radius:20px;
+}
+</style>
+</div>
+
+{% endblock %}
