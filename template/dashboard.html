@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.dashboard-header{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    margin-bottom:24px;
+}
+
+/* KPI Cards */
+.stat-card{
+    background:rgba(255,255,255,0.78);
+    backdrop-filter:blur(14px);
+    border-radius:18px;
+    padding:26px;
+    text-align:center;
+    box-shadow:0 12px 35px rgba(0,0,0,0.12);
+}
+
+.stat-card h2{
+    font-size:36px;
+    margin:0;
+    font-weight:800;
+    color:#15803d;
+}
+
+.stat-card p{
+    margin-top:6px;
+    font-size:14px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:#475569;
+}
+
+/* Chart Cards */
+.chart-card{
+    background:rgba(255,255,255,0.9);
+    border-radius:20px;
+    padding:28px;
+    box-shadow:0 14px 40px rgba(0,0,0,0.12);
+    margin-bottom:28px;
+}
+
+.chart-card h5{
+    font-weight:700;
+    margin-bottom:18px;
+}
+
+/* Table */
+.table{
+    font-size:14px;
+}
+
+.table thead th{
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:0.6px;
+    color:#475569;
+}
+
+/* DARK MODE SUPPORT */
+body.dark-mode .stat-card,
+body.dark-mode .chart-card{
+    background:rgba(30,41,59,0.9);
+    color:#e5e7eb;
+}
+
+body.dark-mode .stat-card p,
+body.dark-mode .table{
+    color:#cbd5f5;
+}
+
+body.dark-mode .table thead th{
+    color:#94a3b8;
+}
+</style>
+
+<div class="dashboard-header">📊 Analytics Dashboard</div>
+
+<!-- ===== KPI ROW ===== -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h2>{{ data|length }}</h2>
+            <p>Total Predictions</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h2>{{ session.user }}</h2>
+            <p>User</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h2>Active</h2>
+            <p>Account Status</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CHARTS ===== -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>📈 Predictions Timeline</h5>
+            <canvas id="timelineChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>🧪 Fertilizer Usage</h5>
+            <canvas id="fertilizerChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HISTORY TABLE ===== -->
+<div class="chart-card">
+    <h5>🗂 Prediction History</h5>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Crop</th>
+                <th>Fertilizer</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ===== JS DATA PREP ===== -->
+<script>
+const rawData = [
+    {% for row in data %}
+        { crop:"{{ row[0] }}", fertilizer:"{{ row[1] }}", date:"{{ row[2] }}" },
+    {% endfor %}
+];
+
+// ===== TIMELINE DATA =====
+const dates = rawData.map(d => d.date);
+const counts = dates.map((_,i)=>i+1);
+
+// ===== FERTILIZER COUNT =====
+const fertCount = {};
+rawData.forEach(d=>{
+    fertCount[d.fertilizer] = (fertCount[d.fertilizer] || 0) + 1;
+});
+</script>
+
+<!-- ===== CHARTS ===== -->
+<script>
+new Chart(document.getElementById("timelineChart"),{
+    type:"line",
+    data:{
+        labels:dates,
+        datasets:[{
+            label:"Predictions",
+            data:counts,
+            borderColor:"#22c55e",
+            backgroundColor:"rgba(34,197,94,0.25)",
+            tension:0.45,
+            fill:true,
+            pointRadius:4
+        }]
+        
+    },
+    options:{
+        responsive:true,
+        plugins:{legend:{display:false}}
+    }
+});
+
+new Chart(document.getElementById("fertilizerChart"),{
+    type:"bar",
+    data:{
+        labels:Object.keys(fertCount),
+        datasets:[{
+            label:"Usage Count",
+            data:Object.values(fertCount),
+            backgroundColor:"#16a34a",
+            borderRadius:8
+        }]
+    },
+    options:{
+        responsive:true,
+        plugins:{legend:{display:false}}
+    }
+});
+</script>
+
+{% endblock %}

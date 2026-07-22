@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block content %}
+   
+    <title>Fertilizer Recommendation Result</title>
+
+    <style>
+    .container{
+        background:white;
+        width:90%;
+        max-width:750px;
+        padding:35px 40px;
+        border-radius:18px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.15);
+        text-align:center;
+        border-top:6px solid #2e7d32;
+    }
+
+    .btn{
+        display:inline-block;
+        margin-top:30px;
+        padding:12px 26px;
+        background:linear-gradient(135deg,#2e7d32,#1b5e20);
+        color:white;
+        text-decoration:none;
+        border-radius:10px;
+        font-weight:bold;
+    }
+
+    
+
+    .main-result{font-size:22px;font-weight:bold;color:#1b5e20;}
+    .quantity{font-size:18px;margin-top:6px;}
+    .usage{margin-top:6px;color:#555;}
+
+    .tips-list{text-align:left;margin-top:10px;padding-left:20px;}
+    .tips-list li{margin-bottom:8px;}
+
+    .speak-line{transition:0.3s;}
+    .speaking{
+        background:#ffe8a3;
+        padding:6px 12px;
+        border-radius:8px;
+        box-shadow:0 0 12px rgba(255,170,0,0.7);
+        transform:scale(1.03);
+    }
+
+    /* Assistant bubble */
+    .assistant{
+        position:fixed;
+        bottom:25px;
+        right:25px;
+        background:white;
+        border-radius:50px;
+        padding:14px 20px;
+        box-shadow:0 4px 18px rgba(0,0,0,0.25);
+        display:flex;
+        align-items:center;
+        gap:12px;
+        font-size:14px;
+        z-index:9999;
+        border-left:5px solid #2e7d32;
+    }
+
+    .assistant-icon{
+        width:45px;height:45px;
+        background:#2e7d32;
+        color:white;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:22px;
+    }
+    .container{
+        
+        width:90%;
+        max-width:750px;
+        padding:35px 40px;
+        text-align:center;
+        border-top:6px solid #6366f1; /* changed color */
+        margin-top:30px;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(12px);
+        border-radius:20px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.15);
+    }
+
+    .assistant-text{font-weight:600;color:#333;min-width:220px;}
+
+    .cursor{
+        display:inline-block;
+        width:3px;height:16px;
+        background:#2e7d32;
+        margin-left:4px;
+        animation:blink 1s infinite;
+    }
+    @keyframes blink{0%{opacity:1;}50%{opacity:0;}100%{opacity:1;}}
+
+    .sound-bars{display:flex;gap:3px;margin-left:6px;}
+    .bar{width:3px;height:12px;background:#2e7d32;animation:wave 1s infinite;}
+    .bar:nth-child(2){animation-delay:.2s;}
+    .bar:nth-child(3){animation-delay:.4s;}
+    .bar:nth-child(4){animation-delay:.6s;}
+    @keyframes wave{0%,100%{height:6px;}50%{height:16px;}}
+    </style>
+   
+
+  
+
+    <div class="container">
+    <h2>🌾 Fertilizer Recommendation Result</h2>
+    <div class="card p-4 mx-auto mt-4" style="max-width:700px;">
+    <p class="main-result speak-line">{{ result }}</p>
+    <p class="quantity speak-line">{{ quantity }}</p>
+    <p class="usage speak-line">{{ usage }}</p>
+    </div>
+
+    <hr>
+
+    <h3>🧪 Soil Health Status</h3>
+    <p class="speak-line">{{ health }}</p>
+
+    {% if tips %}
+    <hr>
+    <h3>💡 Smart Farming Tips</h3>
+    <ul class="tips-list">
+    {% for tip in tips %}
+    <li class="speak-line">{{ tip }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    <br>
+    <a href="/" class="btn" onclick="stopAudio()">🔙 Go Back</a>
+    </div>
+
+    {% if audio_file %}
+    <audio id="resultAudio" autoplay>
+    <source src="{{ url_for('static', filename=audio_file) }}" type="audio/mpeg">
+    </audio>
+    {% endif %}
+
+    <!-- Assistant -->
+    <div id="assistantBox" class="assistant" style="display:none;">
+    <div class="assistant-icon">🌾</div>
+    <div class="assistant-text">
+    <span id="assistantTyping"></span>
+    <span class="cursor"></span>
+    </div>
+    <div id="soundBars" class="sound-bars" style="display:none;">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    </div>
+    </div>
+
+    <script>
+    function stopAudio(){
+    let audio=document.getElementById("resultAudio");
+    if(audio){audio.pause();audio.currentTime=0;}
+    }
+
+    window.onload=function(){
+
+    let audio=document.getElementById("resultAudio");
+    let box=document.getElementById("assistantBox");
+    let typing=document.getElementById("assistantTyping");
+    let bars=document.getElementById("soundBars");
+    let lines=document.querySelectorAll(".speak-line");
+
+    if(!audio)return;
+
+    /* show assistant */
+    audio.onplay=function(){
+    box.style.display="flex";
+    bars.style.display="flex";
+    startTyping();
+    startHighlight();
+    };
+
+    /* typing text */
+    function startTyping(){
+    let msg="Explaining your fertilizer recommendation...";
+    let i=0;
+    typing.innerHTML="";
+    (function type(){
+    if(i<msg.length){
+    typing.innerHTML+=msg[i++];
+    setTimeout(type,35);
+    }
+    })();
+    }
+
+    /* highlight sync with audio */
+    function startHighlight(){
+
+    if(lines.length===0)return;
+
+    if(audio.readyState<1){
+    audio.onloadedmetadata=run;
+    }else run();
+
+    function run(){
+
+    let total=audio.duration*1000;
+    if(total<2000) total=lines.length*2500;
+
+    let perLine=total/lines.length;
+    let index=0;
+
+    (function next(){
+
+    lines.forEach(l=>l.classList.remove("speaking"));
+
+    if(index<lines.length){
+
+    let line=lines[index];
+    line.classList.add("speaking");
+
+    line.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+    });
+
+    index++;
+    setTimeout(next,perLine);
+    }
+    })();
+    }
+    }
+    };
+    </script>
+
+    
+{% endblock %}
